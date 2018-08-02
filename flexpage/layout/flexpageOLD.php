@@ -94,66 +94,58 @@ if ($hascustommenu) {
     $bodyclasses[] = 'has_custom_menu';
 }
 
-//Generar la URL del curso
-$courseurl = $CFG->wwwroot."/course/view.php?id=".$PAGE->course->id;
-
-//Generar el Breadcrumb
-$breadcrumb = '<a class="navbar-link" href="'. $courseurl . '">'. $PAGE->course->fullname .'</a>'; //Nombre del curso, va siempre
-if($sectionname) {$breadcrumb .= ' <span class="separador">|</span> <a class="navbar-link" href="'. $sectionurl . '">'.$sectionname .'</a>';};  //Agregamos nombre de sección, si está disponible
-if($PAGE->cm->name) {$breadcrumb .= ' <span class="separador">|</span> '.$PAGE->cm->name;}; //Agregamos nombre del módulo (Página/Foro/Carpeta/Etc), si está disponible.
-
-
 echo $OUTPUT->doctype() ?>
 <html <?php echo $OUTPUT->htmlattributes() ?>>
 <head>
-    <!-- Head -->
-    <?php require('head.php'); ?>
-    <!-- /Head -->
+    <title><?php echo $PAGE->title ?></title>
+    <link rel="shortcut icon" href="<?php echo $OUTPUT->pix_url('favicon', 'theme')?>" />
+    <?php echo $OUTPUT->standard_head_html() ?>
+    <?php echo format_flexpage_default_width_styles() ?>
 </head>
-<body id="<?php p($PAGE->bodyid) ?>" <?php echo $OUTPUT->body_attributes(); ?>>
+<body id="<?php p($PAGE->bodyid) ?>" class="<?php p($PAGE->bodyclasses.' '.join(' ', $bodyclasses)) ?>">
 <?php echo $OUTPUT->standard_top_of_body_html() ?>
-<?php if($hassidepre) { ?>
-    <div class="navmenu navmenu-default navmenu-fixed-left navmenu-inverse"> <!-- Navbar Lateral -->
-        <?php if($PAGE->course->fullname) { ?>
-            <div class="bloque-lateral panel panel-default coursename block"> <!-- Nombre del curso. -->
-                <div class="panel-body nopadding"><h1 class="text-center nomargin"><?php echo $PAGE->course->fullname; ?></h1></div>
+<div id="page">
+<?php if ($hasheading || $hasnavbar || !empty($courseheader)) { ?>
+    <div id="page-header">
+        <?php if ($hasheading) { ?>
+        <h1 class="headermain"><?php echo $PAGE->heading ?></h1>
+        <div class="headermenu"><?php
+            if ($haslogininfo) {
+                echo $OUTPUT->login_info();
+            }
+            if (!empty($PAGE->layout_options['langmenu'])) {
+                echo $OUTPUT->lang_menu();
+            }
+            echo $PAGE->headingmenu
+        ?></div><?php } ?>
+        <?php if (!empty($courseheader)) { ?>
+            <div id="course-header"><?php echo $courseheader; ?></div>
+        <?php } ?>
+        <?php if ($hascustommenu) { ?>
+        <div id="custommenu"><?php echo $custommenu; ?></div>
+        <?php } ?>
+        <?php echo format_flexpage_tabs() ?>
+        <?php if ($hasnavbar) { ?>
+            <div class="navbar clearfix">
+                <div class="breadcrumb"><?php echo $OUTPUT->navbar(); ?></div>
+                <div class="navbutton"> <?php echo $PAGE->button; ?></div>
             </div>
-        <?php }; ?>
-        <div class="bloque-lateral panel panel-default breadcrumb block visible-sm visible-xs"> <!-- Breadcrumb, solo SM y XS -->
-            <div class="panel-body">
-                <?php echo $breadcrumb; ?>
-            </div>
-        </div>
-        <?php echo $OUTPUT->blocks('side-pre'); ?>
-    </div> <!-- ./navbar lateral -->
-<?php }; ?>
-<div class="canvas <?php if($PAGE->cm->section) {echo "section-" . $PAGE->cm->section;}; if($PAGE->cm->sectionname) {echo "sectionname-" . $PAGE->cm->sectionname;}; ?>">
-    <!-- Navbar superior -->
-    <nav class="navbar navbar-default navbar-fixed-top navbar-inverse">
-        <div class="container-fluid">
-            <?php if($hassidepre) { ?>
-                <button type="button" class="navbar-toggle" data-toggle="offcanvas" data-recalc="false" data-target=".navmenu" data-canvas=".canvas">
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                </button>
-                <p class="navbar-brand hidden-sm hidden-xs"><?php echo $breadcrumb; ?></p>
-            <?php } else { ?>
-                <p class="navbar-brand"><?php echo '<a class="navbar-link" href="'. $courseurl . '">'. $PAGE->course->fullname .'</a>'; ?></p>
-            <?php }; ?>
-            <div class="navbar-right hidden-sm hidden-xs"><?php echo $OUTPUT->user_menu(); ?></div>
-        </div>
-    </nav> <!-- ./navbar superior -->
-
+        <?php } ?>
+    </div>
+<?php } ?>
 <!-- END OF HEADER -->
 
+<!-- Flexpage content -->
+    <div id="flexpage_actionbar" class="flexpage_actionbar clearfix">
+        <?php echo $OUTPUT->main_content() ?>
+    </div>
 
 <!-- START CONTENT BODY -->
-    <div class="container-fluid main-container" id="page-content">
-        <?php echo $OUTPUT->main_content() ?>
+    <div id="page-content">
+
         <?php if ($hassidetop) { ?>
-        <div id="region-top" class="block-region col-md-12">
-            <div class="region-content col-md-12">
+        <div id="region-top" class="block-region">
+            <div class="region-content">
                 <?php echo $OUTPUT->blocks('side-top') ?>
             </div>
         </div>
@@ -166,23 +158,40 @@ echo $OUTPUT->doctype() ?>
             ?>
         </div>
         <?php } ?>
-        <div id="region-main-box"  >
-            <div id="region-post-box"  class="col-md-12">
+        <div id="region-main-box">
+            <div id="region-post-box">
 
-                <div id="region-main-wrap" class="col-md-9">
+                <div id="region-main-wrap">
                     <div id="region-main" class="block-region">
-                        <div class="region-content" >
+                        <div class="region-content">
                             <?php echo $OUTPUT->blocks('main') ?>
                         </div>
                     </div>
                 </div>
 
-                <?php if ($hassidepost OR (right_to_left() AND $hassidepre)) { ?>
-                <div id="region-post" class="block-region col-md-3">
+                <?php if ($hassidepre OR (right_to_left() AND $hassidepost)) { ?>
+                <div id="region-pre" class="block-region">
                     <div class="region-content">
                         <?php
+                        if (!right_to_left()) {
+                            echo $OUTPUT->blocks('side-pre');
+                        } elseif ($hassidepost) {
                             echo $OUTPUT->blocks('side-post');
-                         ?>
+                        } ?>
+
+                    </div>
+                </div>
+                <?php } ?>
+
+                <?php if ($hassidepost OR (right_to_left() AND $hassidepre)) { ?>
+                <div id="region-post" class="block-region">
+                    <div class="region-content">
+                        <?php
+                        if (!right_to_left()) {
+                            echo $OUTPUT->blocks('side-post');
+                        } elseif ($hassidepre) {
+                            echo $OUTPUT->blocks('side-pre');
+                        } ?>
                     </div>
                 </div>
                 <?php } ?>
@@ -191,8 +200,22 @@ echo $OUTPUT->doctype() ?>
         </div>
     </div>
 
+<!-- START OF FOOTER -->
+    <?php if (!empty($coursefooter)) { ?>
+        <div id="course-footer"><?php echo $coursefooter; ?></div>
+    <?php } ?>
+    <?php if ($hasfooter) { ?>
+    <div id="page-footer" class="clearfix">
+        <p class="helplink"><?php echo page_doc_link(get_string('moodledocslink')) ?></p>
+        <?php
+        echo $OUTPUT->login_info();
+        echo $OUTPUT->home_link();
+        echo $OUTPUT->standard_footer_html();
+        ?>
+    </div>
+    <?php } ?>
+    <div class="clearfix"></div>
 </div>
-<?php require('end_of_html.php'); ?>
 <?php echo $OUTPUT->standard_end_of_body_html() ?>
 </body>
 </html>
