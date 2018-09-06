@@ -169,7 +169,7 @@ echo $OUTPUT->doctype() ?>
         <div id="region-main-box"  >
             <div id="region-post-box"  class="col-md-12">
 
-                <div id="region-main-wrap" class="col-md-9">
+                <div id="region-main-wrap" class="col-md-6">
                     <div id="region-main" class="block-region">
                         <div class="region-content" >
                             <?php echo $OUTPUT->blocks('main') ?>
@@ -178,7 +178,7 @@ echo $OUTPUT->doctype() ?>
                 </div>
 
                 <?php if ($hassidepost OR (right_to_left() AND $hassidepre)) { ?>
-                <div id="region-post" class="block-region col-md-3">
+                <div id="region-post" class="block-region col-md-6">
                     <div class="region-content">
                         <?php
                             echo $OUTPUT->blocks('side-post');
