@@ -45,6 +45,7 @@ $haslogininfo = (empty($PAGE->layout_options['nologininfo']));
 $showsidepre = ($hassidepre && !$PAGE->blocks->region_completely_docked('side-pre', $OUTPUT));
 $showsidepost = ($hassidepost && !$PAGE->blocks->region_completely_docked('side-post', $OUTPUT));
 
+
 // Always show block regions when editing so blocks can
 // be dragged into empty block regions.
 if ($PAGE->user_is_editing()) {
@@ -99,8 +100,14 @@ $courseurl = $CFG->wwwroot."/course/view.php?id=".$PAGE->course->id;
 
 //Generar el Breadcrumb
 $breadcrumb = '<a class="navbar-link" href="'. $courseurl . '">'. $PAGE->course->fullname .'</a>'; //Nombre del curso, va siempre
-if($sectionname) {$breadcrumb .= ' <span class="separador">|</span> <a class="navbar-link" href="'. $sectionurl . '">'.$sectionname .'</a>';};  //Agregamos nombre de sección, si está disponible
-if($PAGE->cm->name) {$breadcrumb .= ' <span class="separador">|</span> '.$PAGE->cm->name;}; //Agregamos nombre del módulo (Página/Foro/Carpeta/Etc), si está disponible.
+
+//Agregamos nombre del módulo (Página/Foro/Carpeta/Etc), si está disponible.
+if($PAGE->cm->name) {
+    //Agregamos nombre de sección, si está disponible
+    $breadcrumb .= ' <span class="separador">|</span> '.$PAGE->cm->name;
+}else{
+    $breadcrumb .= ' <span class="separador">|</span> <a class="navbar-link" href="'. $sectionurl . '">'.$PAGE->title .'</a>';
+};
 
 
 echo $OUTPUT->doctype() ?>
